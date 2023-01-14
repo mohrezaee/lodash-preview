@@ -74,6 +74,28 @@ for(let i = 0; i < 5; i++) {
 let result = _.times(5, taas);
 ```
 
+## تابع debounce
+فرض کنید میخواهیم یک فیلد ورودی برای جستجو بین محصولات یک فروشگاه داشته باشیم. با هربار تغییر ورودی، باید به صورت خودکار یک درخواست سمت بکند ارسال شود و نتیجه را نمایش دهد. چیزی شبیه به کد زیر:
+
+```
+const searchInput = document.getElementById("search-input");
+function onInputChange(e) {
+   const inputString = e.target.value;
+   // make api call with inputString
+}
+searchInput.addEventListener("keyup", onInputChange);
+```
+فقط یک مشکلی وجود دارد. فرض کنید من میخواهم محصول هندونه را جستجو کنم. با نوشتن حرف اول ه، یک درخواست سمت سرور ارسال میشود ولی ممکن است به هر دلیلی نتایج از سمت سرور دیر بازگردد ولی من از این موضوع خبردار نیستم و حرف دوم ن را وارد میکنم. ولی نتیجه ی جستجو برای ورودی هن بلافاصله از سمت سرور برمیگردد. بعد هم نتایج درخواست اول از سمت سرور باز میگردد و در نهایت به من نمایش داده میشود. یعنی من ورودی هن را میخواستم ولی چیزی که به من نمایش داده شده، برای ورودی ه است که درست نیست. کتابخانه lodash یک تابع خوب برای این مشکل پیشنهاد میدهد:
+```
+const searchInput = document.getElementById("search-input");
+function onInputChange(e) {
+   const inputString = e.target.value;
+   // make api call with inputString
+}
+searchInput.addEventListener("keyup", _.debounce(onInputChange, 500));
+```
+با نوشتن کد بالا، بعد از یکبار فراخوانی تابع onInputChange، اگر کاربر یک حرف دیگر را وارد کند و فاصله ی زمانی این دو ورودی کمتر از 500 میلی ثانیه باشد، فراخوانی اول کنسل میشود و با ورودی دوم فقط فراخوانی انجام میشود که مشکل مارا برطرف میکند
+
 
 
 ## متد های مربوط به آرایه
