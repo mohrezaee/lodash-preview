@@ -97,7 +97,56 @@ searchInput.addEventListener("keyup", _.debounce(onInputChange, 500));
 با نوشتن کد بالا، بعد از یکبار فراخوانی تابع onInputChange، اگر کاربر یک حرف دیگر را وارد کند و فاصله ی زمانی این دو ورودی کمتر از 500 میلی ثانیه باشد، فراخوانی اول کنسل میشود و با ورودی دوم فقط فراخوانی انجام میشود که مشکل مارا برطرف میکند
 
 
+## تابع find
+فرض کنید یک آرایه از آبجکت های مختلف با ویژگی های مختلف داریم و میخواهیم آبجکتی را پیدا کنیم تا ویژگی های خاص مورد نظر مارا داشته باشد. بدون استفاده از کتابخانه ی اضافی باید این کار را به صورت زیر انجام دهیم:
+```
+const fruits = [
+   {name: "hendooneh", poosteh: "sabz", gooshteh: "ghermez", "gheymat": "arzoon"},
+   {name: "kharbozeh", poosteh: "zard", gooshteh: "sabz", "gheymat": "arzoon"},
+   {name: "kivi", poosteh: "ghahvehie", gooshteh: "sabz", "gheymat": "geroon"},
+   {name: "anaar", poosteh: "ghermez", gooshteh: "ghermez", "gheymat": "geroon"},
+]
+const myFruits = fruits.filter(fruit => fruit.gooshteh === "sabz" && fruit.gheymat === "arzoon");
+```
+و با استفاده از lodash داریم:
+```
+const myFruits = _.find(fruits, {gooshteh: "sabz", "gheymat": "arzoon"});
+```
 
+تابع set
+برای ایجاد کردن ویژگی های مختلف درون یک آبجکت که خودشان هم یک آبجکت باشند، کار سختی در پیش دارید. اما با استفاده از تابع set، به راحتی میتوانید این کار را انجام دهید و اگر رده های بالاتر آن چیزی که میخواهید بسازید وجود نداشته باشد، خود به خود ساخته میشود:
+```
+const fruit = { components: { poosteh: [] } };
+_.set(fruit, "components.gooshteh[0]", "rang");
+// fruit: { components: { poosteh: [], gooshteh: ["rang"] } 
+```
+
+تابع keyBy
+فرض کنید یک آرایه از میوه ها داریم و هر کدام از میوه ها یک id دارند که برای هر میوه یکتااست. ما میخواهیم زیاد از این id استفاده کنیم و نمیخواهیم هردفعه از تابع find و یا filter استفاده کنیم. یک تکنیک این است که برای هر میوه یک key در نظر بگیریم و هر دفعه خیلی سریع مثلا بگوییم fruits[id] را به من بده. برای این کار میتواینم از keyBy به راحتی استفاده کینم:
+```
+let fruits = [
+   {id: "2234", name: "hendooneh", poosteh: "sabz", gooshteh: "ghermez", "gheymat": "arzoon"},
+   {id: "5234", name: "kharbozeh", poosteh: "zard", gooshteh: "sabz", "gheymat": "arzoon"},
+   {id: "7234", name: "kivi", poosteh: "ghahvehie", gooshteh: "sabz", "gheymat": "geroon"},
+   {id: "1983", name: "anaar", poosteh: "ghermez", gooshteh: "ghermez", "gheymat": "geroon"},
+]
+fruits = _.keyBy(fruits, "id");
+const myFruit = fruits["5234"];
+// myFruit: {id: "5234", name: "kharbozeh", poosteh: "zard", gooshteh: "sabz", "gheymat": "arzoon"}
+
+```
+
+## تابع cloneDeep
+برای اینکه از یک آبجکت کپی بگیریم، راه های مختلفی داریم. بدون استفاده از هیچ تابع اضافی میتوانیم کد زیر را در به عنوان کپی در نظر بگیریم:
+```
+const myObj = {...};
+const myCopyObj = JSON.parse(JSON.stringify(myObj));
+```
+ولی یک راه ساده تر در lodash وجود دارد:
+```
+const myObj = {...};
+const myCopyObj = _.cloneDeep(myObj);
+```
 ## متد های مربوط به آرایه
 یکی از مهمترین مواردی که lodash به آن می‌پردازد بهبود پردازش آرایه‌ها است که در لینک زیر documentation همه‌ی آن‌ها آمده. اما ما در اینجا به برخی پرکاربردترین‌ها
 می‌پردازیم.
