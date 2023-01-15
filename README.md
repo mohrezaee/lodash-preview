@@ -35,9 +35,187 @@ var _ = require('lodash/core');
 var fp = require('lodash/fp');
  
 ```
-در ادامه به متدهای مهمی که در این کتابخانه معرفی شده‌اند می‌پردازیم.
 
-## تابع assign
+در لینک زیر documentation همه‌ی توابع کتابخانه lodash آمده است. اما در اینجا، برخی از توابع پرکاربرد آن را بررسی می‌کنیم:
+* https://lodash.com/docs/4.17.15 
+
+## توابع آرایه
+
+### تابع concat
+یکی از کارهای رایجی که در کار با آرایه‌ها به آن بر می‌خورید ادغام کردن چند آرایه با یکدیگر یا concatenation است، که lodash این امکان را می‌دهد تا آرایه‌هایی با ظاهرهایی متفاوت را به راحتی ادغام کنید.
+
+```
+var array = [1,2,3];
+var concated_array = _.concat(array, 4 , [5,6], [[7]]);
+
+// concated_array : [1,2,3,4,5,6,[7]]
+```
+
+### تابع indexOf
+اکثر زبان‌های برنامه‌نویسی سطح بالا این امکان را دارند، اما استفاده از indexOf(array, value, [fromIndex=0])._ به برنامه‌نویس این امکان را می‌دهد تا شروع نقطه‌ی جستجو را مشخص کند.
+در مثال زیر می‌توانیم جایگاه حرف d را بعد از اولین حرف d پیدا کنیم.
+```
+_.indexOf(['b','a','d','b','a','d','a','k'],'d',3);
+// => 5
+```
+### تابع remove
+این متد امکان استفاده از تابع برای حذف عناصری با ویژگی مشخص را از یک آرایه به کاربر می‌دهد. در مثال زیر می‌توان اعداد زوج را از آرایه حذف کرد، همچنین عناصر حذف شده هم در آرایه جدید ذخیره می‌شوند.
+
+
+```
+var array = [1, 2, 3, 4];
+var odd_array = _.remove(array, function(n) {
+  return n % 2 == 1;
+});
+
+// array: [2, 4]
+// array: [1, 3]
+```
+
+
+## توابع Collection
+
+### تابع countBy
+این متد یک آرایه یا یک آبجکت iterable را به عنوان ورودی گرفته و با شمارش عناصر با تابع مد نظر یک آبجکت key-value خروجی می‌دهد.
+
+```
+_.countBy([6.1, 4.2, 6.3], Math.floor);
+// => { '4': 1, '6': 2 }
+ 
+_.countBy(['apple', 'banana', 'coconut','carrot'], 'length');
+// => { '5': 1, '6': 2, '7':1 }
+```
+اگر به جای تعداد عناصر خود آن‌ها را به عنوان value در آبجکت خواستید می‌توانید از متد groupBy استفاده کنید.
+
+### تابع sampleSize
+برای نمونه گیری از آبجکت‌های iterable یا آرایه از ایت متد استفاده می‌کنیم.
+در واقع با مشخص کردن تعداد نمونه‌ها به همان تعداد عضو دلخواه از آرایه زیر انتخاب می‌شود.
+```
+_.sampleSize([1, 2, 3, 4, 5, 6], 3);
+// => [2, 6, 5]
+```
+در واقع با مشخص کردن تعداد نمونه‌ها به همان تعداد عضو دلخواه از آرایه‌ی بالا انتخاب می‌شود.
+
+### تابع find
+فرض کنید یک آرایه از آبجکت های مختلف با ویژگی های مختلف داریم و میخواهیم آبجکتی را پیدا کنیم تا ویژگی های خاص مورد نظر مارا داشته باشد. بدون استفاده از کتابخانه ی اضافی باید این کار را به صورت زیر انجام دهیم:
+```
+const fruits = [
+   {name: "hendooneh", poosteh: "sabz", gooshteh: "ghermez", "gheymat": "arzoon"},
+   {name: "kharbozeh", poosteh: "zard", gooshteh: "sabz", "gheymat": "arzoon"},
+   {name: "kivi", poosteh: "ghahvehie", gooshteh: "sabz", "gheymat": "geroon"},
+   {name: "anaar", poosteh: "ghermez", gooshteh: "ghermez", "gheymat": "geroon"},
+]
+const myFruits = fruits.filter(fruit => fruit.gooshteh === "sabz" && fruit.gheymat === "arzoon");
+```
+و با استفاده از lodash داریم:
+```
+const myFruits = _.find(fruits, {gooshteh: "sabz", "gheymat": "arzoon"});
+```
+
+### تابع keyBy
+فرض کنید یک آرایه از میوه ها داریم و هر کدام از میوه ها یک id دارند که برای هر میوه یکتااست. ما میخواهیم زیاد از این id استفاده کنیم و نمیخواهیم هردفعه از تابع find و یا filter استفاده کنیم. یک تکنیک این است که برای هر میوه یک key در نظر بگیریم و هر دفعه خیلی سریع مثلا بگوییم fruits[id] را به من بده. برای این کار میتواینم از keyBy به راحتی استفاده کینم:
+```
+let fruits = [
+   {id: "2234", name: "hendooneh", poosteh: "sabz", gooshteh: "ghermez", "gheymat": "arzoon"},
+   {id: "5234", name: "kharbozeh", poosteh: "zard", gooshteh: "sabz", "gheymat": "arzoon"},
+   {id: "7234", name: "kivi", poosteh: "ghahvehie", gooshteh: "sabz", "gheymat": "geroon"},
+   {id: "1983", name: "anaar", poosteh: "ghermez", gooshteh: "ghermez", "gheymat": "geroon"},
+]
+fruits = _.keyBy(fruits, "id");
+const myFruit = fruits["5234"];
+// myFruit: {id: "5234", name: "kharbozeh", poosteh: "zard", gooshteh: "sabz", "gheymat": "arzoon"}
+
+```
+
+
+## توابع مربوط به رشته
+
+### تابع camelCase
+این متد جالب رشته‌هایی که به فرم‌های متفاوتی نوشته‌شده‌اند را camelCase می‌کند.
+```
+_.camelCase('Get Text');
+// => 'getText'
+ 
+_.camelCase('--get-text--');
+// => 'getText'
+ 
+_.camelCase('__GET_TEXT__');
+// => 'getText'
+```
+
+### تابع escape
+گاهی نیاز داریم تا کاراکترهایی چون "&" ، ">" ، "'" را به رشته‌ای قابل فهم در HTML تبدیل کند.
+```
+_.escape('change & and < to HTML entities');
+// => 'change &amp; and &lt; to HTML entities'
+```
+برای مشاهده‌ی لیست تمامی HTML entities ها به لینک زیر مراجعه کنید.
+* https://oinam.github.io/entities/
+### تابع truncate
+این متد کارآمد در انتهای رشته‌ای طولانی (30 حرف به صورت پیشفرض) "..." قرار می‌دهد و با دریافت آرگومان‌هایی که در مثال زیر بررسی می‌شوند طول رشته و اینکه چه رشته‌ای در انتها قرار گیرد را مشخص می‌کند.
+```
+_.truncate('This is going to become a long loooooooooong text');
+// => 'This is going to become a l...'
+ 
+_.truncate('This is going to become a long loooooooooong text', {
+  'length': 33,
+  'omission': ' [...]'
+});
+// => 'This is going to become a long [...]'
+```
+
+
+## توابع Lang
+این قسمت مربوط به type های مختلف می‌شود که به دو مورد از آن‌ها پرداخته و بقیه موارد که مشابه این دو هستند را می‌توانید در لینک زیر جستجو کنید.
+* https://lodash.com/docs/4.17.15#castArray
+
+### تابع castArray
+این متد تمامی type ها را به عنوان ورودی گرفته و به عنوان یک آرایه تک عضوی خروجی می‌دهد.
+```
+_.castArray(123);
+// => [123]
+ 
+_.castArray({ 'color': 'red' });
+// => [{ 'a': 1 }]
+ 
+_.castArray('123');
+// => ['123']
+ 
+_.castArray(null);
+// => [null]
+ 
+_.castArray(undefined);
+// => [undefined]
+
+```
+### تابع isDate
+این متد صرفا به عنوان نمونه آمده و هرگونه type دیگری که مد نظر هست را می‌توان به همین صورت پیاده‌سازی کرد.
+```
+var date = new Date;
+var not_date = '2022/02/02';
+
+_.isDate('date')
+// => true
+
+_.isDate(not_date)
+// => false
+```
+### تابع cloneDeep
+برای اینکه از یک آبجکت کپی بگیریم، راه های مختلفی داریم. بدون استفاده از هیچ تابع اضافی میتوانیم کد زیر را در به عنوان کپی در نظر بگیریم:
+```
+const myObj = {...};
+const myCopyObj = JSON.parse(JSON.stringify(myObj));
+```
+ولی یک راه ساده تر در lodash وجود دارد:
+```
+const myObj = {...};
+const myCopyObj = _.cloneDeep(myObj);
+```
+
+
+## توابع Object
+
+### تابع assign
 با استفاده از این تابع میتوانیم propertyهای مختلف را از آبجکت های مختلف استخراج کنیم و درون آبجکت مقصد بنویسیم. فرضا کنید دوتا آبجکت هندونه و خربزه را داریم و میخواهیم یک مخلوطی از این دورا درون یک آبجکت بریزیم:
 
 ```
@@ -52,7 +230,18 @@ mix = _.assign(hendooneh, kharbozeh);
 ```
 توجه کنید که اگر یک ویژگی بین آبجکت های ورودی مشترک باشد، ویژگی مربوط به آخرین ورودی وارد آبجکت ما میشود. اینجا هر دو آبجکت ویژگی `poosteh` وجود دارد. ولی چون آبجکت kharbozeh دیر تر وارد شده، بنابراین poostehی مخلوط ما هم زرد خواهد شد.:)
 
-## تابع times
+### تابع set
+برای ایجاد کردن ویژگی های مختلف درون یک آبجکت که خودشان هم یک آبجکت باشند، کار سختی در پیش دارید. اما با استفاده از تابع set، به راحتی میتوانید این کار را انجام دهید و اگر رده های بالاتر آن چیزی که میخواهید بسازید وجود نداشته باشد، خود به خود ساخته میشود:
+```
+const fruit = { components: { poosteh: [] } };
+_.set(fruit, "components.gooshteh[0]", "rang");
+// fruit: { components: { poosteh: [], gooshteh: ["rang"] } 
+```
+
+
+## توابع Util
+
+### تابع times
 
 تابع زیر، پیاده سازی ریختن یک تاس شش وجهی است:
 ```
@@ -74,7 +263,10 @@ for(let i = 0; i < 5; i++) {
 let result = _.times(5, taas);
 ```
 
-## تابع debounce
+
+## توابع کاربردی
+
+### تابع debounce
 فرض کنید میخواهیم یک فیلد ورودی برای جستجو بین محصولات یک فروشگاه داشته باشیم. با هربار تغییر ورودی، باید به صورت خودکار یک درخواست سمت بکند ارسال شود و نتیجه را نمایش دهد. چیزی شبیه به کد زیر:
 
 ```
@@ -95,187 +287,4 @@ function onInputChange(e) {
 searchInput.addEventListener("keyup", _.debounce(onInputChange, 500));
 ```
 با نوشتن کد بالا، بعد از یکبار فراخوانی تابع onInputChange، اگر کاربر یک حرف دیگر را وارد کند و فاصله ی زمانی این دو ورودی کمتر از 500 میلی ثانیه باشد، فراخوانی اول کنسل میشود و با ورودی دوم فقط فراخوانی انجام میشود که مشکل مارا برطرف میکند
-
-
-## تابع find
-فرض کنید یک آرایه از آبجکت های مختلف با ویژگی های مختلف داریم و میخواهیم آبجکتی را پیدا کنیم تا ویژگی های خاص مورد نظر مارا داشته باشد. بدون استفاده از کتابخانه ی اضافی باید این کار را به صورت زیر انجام دهیم:
-```
-const fruits = [
-   {name: "hendooneh", poosteh: "sabz", gooshteh: "ghermez", "gheymat": "arzoon"},
-   {name: "kharbozeh", poosteh: "zard", gooshteh: "sabz", "gheymat": "arzoon"},
-   {name: "kivi", poosteh: "ghahvehie", gooshteh: "sabz", "gheymat": "geroon"},
-   {name: "anaar", poosteh: "ghermez", gooshteh: "ghermez", "gheymat": "geroon"},
-]
-const myFruits = fruits.filter(fruit => fruit.gooshteh === "sabz" && fruit.gheymat === "arzoon");
-```
-و با استفاده از lodash داریم:
-```
-const myFruits = _.find(fruits, {gooshteh: "sabz", "gheymat": "arzoon"});
-```
-
-## تابع set
-برای ایجاد کردن ویژگی های مختلف درون یک آبجکت که خودشان هم یک آبجکت باشند، کار سختی در پیش دارید. اما با استفاده از تابع set، به راحتی میتوانید این کار را انجام دهید و اگر رده های بالاتر آن چیزی که میخواهید بسازید وجود نداشته باشد، خود به خود ساخته میشود:
-```
-const fruit = { components: { poosteh: [] } };
-_.set(fruit, "components.gooshteh[0]", "rang");
-// fruit: { components: { poosteh: [], gooshteh: ["rang"] } 
-```
-
-## تابع keyBy
-فرض کنید یک آرایه از میوه ها داریم و هر کدام از میوه ها یک id دارند که برای هر میوه یکتااست. ما میخواهیم زیاد از این id استفاده کنیم و نمیخواهیم هردفعه از تابع find و یا filter استفاده کنیم. یک تکنیک این است که برای هر میوه یک key در نظر بگیریم و هر دفعه خیلی سریع مثلا بگوییم fruits[id] را به من بده. برای این کار میتواینم از keyBy به راحتی استفاده کینم:
-```
-let fruits = [
-   {id: "2234", name: "hendooneh", poosteh: "sabz", gooshteh: "ghermez", "gheymat": "arzoon"},
-   {id: "5234", name: "kharbozeh", poosteh: "zard", gooshteh: "sabz", "gheymat": "arzoon"},
-   {id: "7234", name: "kivi", poosteh: "ghahvehie", gooshteh: "sabz", "gheymat": "geroon"},
-   {id: "1983", name: "anaar", poosteh: "ghermez", gooshteh: "ghermez", "gheymat": "geroon"},
-]
-fruits = _.keyBy(fruits, "id");
-const myFruit = fruits["5234"];
-// myFruit: {id: "5234", name: "kharbozeh", poosteh: "zard", gooshteh: "sabz", "gheymat": "arzoon"}
-
-```
-
-## تابع cloneDeep
-برای اینکه از یک آبجکت کپی بگیریم، راه های مختلفی داریم. بدون استفاده از هیچ تابع اضافی میتوانیم کد زیر را در به عنوان کپی در نظر بگیریم:
-```
-const myObj = {...};
-const myCopyObj = JSON.parse(JSON.stringify(myObj));
-```
-ولی یک راه ساده تر در lodash وجود دارد:
-```
-const myObj = {...};
-const myCopyObj = _.cloneDeep(myObj);
-```
-## متد های مربوط به آرایه
-یکی از مهمترین مواردی که lodash به آن می‌پردازد بهبود پردازش آرایه‌ها است که در لینک زیر documentation همه‌ی آن‌ها آمده. اما ما در اینجا به برخی پرکاربردترین‌ها
-می‌پردازیم.
-* https://lodash.com/docs/4.17.15
-
-### متد concat
-یکی از کارهای رایجی که در کار با آرایه‌ها به آن بر می‌خورید ادغام کردن چند آرایه با یکدیگر یا concatenation است، که lodash این امکان را می‌دهد تا آرایه‌هایی با ظاهرهایی متفاوت را به راحتی ادغام کنید.
-
-```
-var array = [1,2,3];
-var concated_array = _.concat(array, 4 , [5,6], [[7]]);
-
-// concated_array : [1,2,3,4,5,6,[7]]
-```
-
-### متد indexOf
-اکثر زبان‌های برنامه‌نویسی سطح بالا این امکان را دارند، اما استفاده از indexOf(array, value, [fromIndex=0])._ به برنامه‌نویس این امکان را می‌دهد تا شروع نقطه‌ی جستجو را مشخص کند.
-در مثال زیر می‌توانیم جایگاه حرف d را بعد از اولین حرف d پیدا کنیم.
-```
-_.indexOf(['b','a','d','b','a','d','a','k'],'d',3);
-// => 5
-```
-### متد remove
-این متد امکان استفاده از تابع برای حذف عناصری با ویژگی مشخص را از یک آرایه به کاربر می‌دهد. در مثال زیر می‌توان اعداد زوج را از آرایه حذف کرد، همچنین عناصر حذف شده هم در آرایه جدید ذخیره می‌شوند.
-
-
-```
-var array = [1, 2, 3, 4];
-var odd_array = _.remove(array, function(n) {
-  return n % 2 == 1;
-});
-
-// array: [2, 4]
-// array: [1, 3]
-```
-
-## متد های مربوط به رشته
-در این قسمت به تعدادی از متدهایی که string ها را مورد توجه قرار می‌دهند می‌پردازیم
-.
-
-### متد camelCase
-این متد جالب رشته‌هایی که به فرم‌های متفاوتی نوشته‌شده‌اند را camelCase می‌کند.
-```
-_.camelCase('Get Text');
-// => 'getText'
- 
-_.camelCase('--get-text--');
-// => 'getText'
- 
-_.camelCase('__GET_TEXT__');
-// => 'getText'
-```
-
-### متد escape
-گاهی نیاز داریم تا کاراکترهایی چون "&" ، ">" ، "'" را به رشته‌ای قابل فهم در HTML تبدیل کند.
-```
-_.escape('change & and < to HTML entities');
-// => 'change &amp; and &lt; to HTML entities'
-```
-برای مشاهده‌ی لیست تمامی HTML entities ها به لینک زیر مراجعه کنید.
-* https://oinam.github.io/entities/
-### متد truncate
-این متد کارآمد در انتهای رشته‌ای طولانی (30 حرف به صورت پیشفرض) "..." قرار می‌دهد و با دریافت آرگومان‌هایی که در مثال زیر بررسی می‌شوند طول رشته و اینکه چه رشته‌ای در انتها قرار گیرد را مشخص می‌کند.
-```
-_.truncate('This is going to become a long loooooooooong text');
-// => 'This is going to become a l...'
- 
-_.truncate('This is going to become a long loooooooooong text', {
-  'length': 33,
-  'omission': ' [...]'
-});
-// => 'This is going to become a long [...]'
-```
-
-## متد های مربوط به Lang
-این قسمت مربوط به type های مختلف می‌شود که به دو مورد از آن‌ها پرداخته و بقیه موارد که مشابه این دو هستند را می‌توانید در لینک زیر جستجو کنید.
-* https://lodash.com/docs/4.17.15#castArray
-
-### متد castArray
-این متد تمامی type ها را به عنوان ورودی گرفته و به عنوان یک آرایه تک عضوی خروجی می‌دهد.
-```
-_.castArray(123);
-// => [123]
- 
-_.castArray({ 'color': 'red' });
-// => [{ 'a': 1 }]
- 
-_.castArray('123');
-// => ['123']
- 
-_.castArray(null);
-// => [null]
- 
-_.castArray(undefined);
-// => [undefined]
-
-```
-### متد isDate
-این متد صرفا به عنوان نمونه آمده و هرگونه type دیگری که مد نظر هست را می‌توان به همین صورت پیاده‌سازی کرد.
-```
-var date = new Date;
-var not_date = '2022/02/02';
-
-_.isDate('date')
-// => true
-
-_.isDate(not_date)
-// => false
-```
-## متدهای مربوط به کالکشن
-### متد countBy
-این متد یک آرایه یا یک آبجکت iterable را به عنوان ورودی گرفته و با شمارش عناصر با تابع مد نظر یک آبجکت key-value خروجی می‌دهد.
-
-```
-_.countBy([6.1, 4.2, 6.3], Math.floor);
-// => { '4': 1, '6': 2 }
- 
-_.countBy(['apple', 'banana', 'coconut','carrot'], 'length');
-// => { '5': 1, '6': 2, '7':1 }
-```
-اگر به جای تعداد عناصر خود آن‌ها را به عنوان value در آبجکت خواستید می‌توانید از متد groupBy استفاده کنید.
-
-### متد sampleSize
-برای نمونه گیری از آبجکت‌های iterable یا آرایه از ایت متد استفاده می‌کنیم.
-در واقع با مشخص کردن تعداد نمونه‌ها به همان تعداد عضو دلخواه از آرایه زیر انتخاب می‌شود.
-```
-_.sampleSize([1, 2, 3, 4, 5, 6], 3);
-// => [2, 6, 5]
-```
-در واقع با مشخص کردن تعداد نمونه‌ها به همان تعداد عضو دلخواه از آرایه‌ی بالا انتخاب می‌شود.
-
 
